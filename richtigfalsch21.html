@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch lernen: Richtig oder Falsch?</title>
+    <style>
+        :root {
+            --primary-color: #2b6cb0;
+            --primary-hover: #1e4e8c;
+            --bg-color: #f7fafc;
+            --card-bg: #ffffff;
+            --text-color: #2d3748;
+            --border-color: #e2e8f0;
+            --success-color: #48bb78;
+            --success-bg: #f0fff4;
+            --error-color: #f56565;
+            --error-bg: #fff5f5;
+            --explanation-bg: #edf2f7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 650px;
+            width: 100%;
+            padding: 24px;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .instructions {
+            font-size: 0.95rem;
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .statement-card {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .statement-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1a202c;
+            text-align: center;
+        }
+
+        /* Buttons für Richtig / Falsch */
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .choice-btn {
+            padding: 12px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            background: #ffffff;
+            color: var(--text-color);
+            transition: all 0.2s ease;
+        }
+
+        .choice-btn.true-btn:hover {
+            border-color: var(--success-color);
+            background: var(--success-bg);
+            color: var(--success-color);
+        }
+
+        .choice-btn.false-btn:hover {
+            border-color: var(--error-color);
+            background: var(--error-bg);
+            color: var(--error-color);
+        }
+
+        /* Zustand: Beantwortet (Sperrt andere Interaktionen) */
+        .statement-card.answered .choice-btn {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* Richtig getippt */
+        .statement-card.answered .choice-btn.correct-choice {
+            border-color: var(--success-color) !important;
+            background-color: var(--success-bg) !important;
+            color: var(--success-color) !important;
+            opacity: 1 !important;
+        }
+
+        /* Falsch getippt */
+        .statement-card.answered .choice-btn.wrong-choice {
+            border-color: var(--error-color) !important;
+            background-color: var(--error-bg) !important;
+            color: var(--error-color) !important;
+            opacity: 1 !important;
+        }
+
+        /* Erklärungstext (Wird erst nach Klick per JS eingeblendet) */
+        .explanation {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background-color: var(--explanation-bg);
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0 6px 6px 0;
+            font-size: 0.95rem;
+            color: #2d3748;
+            display: none; 
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Kontroll-Buttons */
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        #resetBtn {
+            background-color: #718096;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+            display: none;
+        }
+
+        #resetBtn:hover {
+            background-color: #4a5568;
+        }
+
+        .feedback {
+            text-align: center;
+            margin-top: 16px;
+            font-weight: bold;
+            min-height: 24px;
+        }
+        .feedback.success { color: var(--success-color); }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h2>Richtig oder Falsch?</h2>
+    <p class="instructions">
+        Entscheide für jeden russischen Satz, ob er grammatikalisch korrekt ist. Du erhältst sofort nach dem Anklicken eine Rückmeldung.
+    </p>
+
+    <div id="quizList">
+        <!-- Satz 1 -->
+        <div class="statement-card" data-correct="false">
+            <div class="statement-text">1. Вчера я ходила в гостях к моей подруге.</div>
+            <div class="btn-group">
+                <button class="choice-btn true-btn" data-value="true">Richtig</button>
+                <button class="choice-btn false-btn" data-value="false">Falsch</button>
+            </div>
+            <div class="explanation">
+                <strong>Korrektur:</strong> Вчера я ходила <strong>в гости к</strong> моей подруге.<br>
+                <em>Erklärung:</em> Das Verb ходила verlangt eine Richtung (Куда? -> Akkusativ): <strong>в гости</strong> kombiniert mit der Präposition <strong>к</strong> (+ Dativ).
+            </div>
+        </div>
+
+        <!-- Satz 2 -->
+        <div class="statement-card" data-correct="true">
+            <div class="statement-text">2. Я была в гостях у моей подруgi.</div>
+            <div class="btn-group">
+                <button class="choice-btn true-btn" data-value="true">Richtig</button>
+                <button class="choice-btn false-btn" data-value="false">Falsch</button>
+            </div>
+            <div class="explanation">
+                <strong>Richtig!</strong><br>
+                <em>Erklärung:</em> Das Verb была beschreibt einen Ort (Где? -> Lokativ): <strong>в гостях</strong> kombiniert mit der Präposition <strong>у</strong> (+ Genitiv).
+            </div>
+        </div>
+
+        <!-- Satz 3 -->
+        <div class="statement-card" data-correct="false">
+            <div class="statement-text">3. Я была в гости у моей подруге.</div>
+            <div class="btn-group">
+                <button class="choice-btn true-btn" data-value="true">Richtig</button>
+                <button class="choice-btn false-btn" data-value="false">Falsch</button>
+            </div>
+            <div class="explanation">
+                <strong>Korrektur:</strong> Я была <strong>в гостях у</strong> моей подруге.<br>
+                <em>Erklärung:</em> Da es sich um einen Zustand/Ort handelt (Wo war ich?), muss hier der Lokativ <strong>в гостях</strong> stehen, nicht die Richtungsform.
+            </div>
+        </div>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <div class="controls">
+        <button id="resetBtn">Neu starten</button>
+    </div>
+</div>
+
+<script>
+    const cards = document.querySelectorAll('.statement-card');
+    const resetBtn = document.getElementById('resetBtn');
+    const feedback = document.getElementById('feedback');
+
+    let answeredCount = 0;
+
+    cards.forEach(card => {
+        const buttons = card.querySelectorAll('.choice-btn');
+        const correctValue = card.getAttribute('data-correct');
+        const explanationBlock = card.querySelector('.explanation');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Verhindert doppeltes Klicken
+                if (card.classList.contains('answered')) return;
+
+                card.classList.add('answered');
+                answeredCount++;
+
+                const chosenValue = btn.getAttribute('data-value');
+
+                // Buttons erst NACH dem Klick einfärben
+                buttons.forEach(b => {
+                    const bValue = b.getAttribute('data-value');
+                    
+                    if (bValue === correctValue) {
+                        b.classList.add('correct-choice');
+                    }
+                    if (bValue === chosenValue && chosenValue !== correctValue) {
+                        b.classList.add('wrong-choice');
+                    }
+                });
+
+                // Erklärung erst jetzt sichtbar machen
+                explanationBlock.style.display = 'block';
+
+                // Prüfen, ob das gesamte Quiz beendet ist
+                if (answeredCount === cards.length) {
+                    feedback.textContent = "Alle Sätze überprüft! 🎉";
+                    feedback.className = "feedback success";
+                    resetBtn.style.display = 'block';
+                }
+            });
+        });
+    });
+
+    // --- NEUSTART ---
+    resetBtn.addEventListener('click', () => {
+        answeredCount = 0;
+        feedback.textContent = "";
+        feedback.className = "feedback";
+        resetBtn.style.display = 'none';
+
+        cards.forEach(card => {
+            card.classList.remove('answered');
+            card.querySelector('.explanation').style.display = 'none';
+            card.querySelectorAll('.choice-btn').forEach(btn => {
+                btn.classList.remove('correct-choice', 'wrong-choice');
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
