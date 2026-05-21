@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch lernen: Text-Markierung (Hotspot)</title>
+    <style>
+        :root {
+            --primary-color: #2b6cb0;
+            --primary-hover: #1e4e8c;
+            --bg-color: #f7fafc;
+            --card-bg: #ffffff;
+            --text-color: #2d3748;
+            --border-color: #e2e8f0;
+            --success-color: #48bb78;
+            --success-bg: #f0fff4;
+            --error-color: #f56565;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            width: 100%;
+            padding: 24px;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .counter-badge {
+            text-align: center;
+            font-size: 1rem;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+            font-weight: bold;
+            background: #ebf8ff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 0 auto 16px auto;
+        }
+
+        .counter-container {
+            text-align: center;
+        }
+
+        .instructions {
+            font-size: 0.95rem;
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        /* Der interaktive Textblock */
+        .text-block {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            font-size: 1.25rem;
+            line-height: 2.2; /* Mehr Zeilenabstand für Touch-Bedienung */
+            color: #1a202c;
+            text-align: justify;
+            margin-bottom: 24px;
+        }
+
+        /* Styling für jedes klickbare Element im Fließtext */
+        .word {
+            display: inline-block;
+            padding: 0 4px;
+            margin: 0 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .word:hover {
+            background-color: #edf2f7;
+        }
+
+        /* Zustand: Richtiger Hotspot gefunden */
+        .word.correct {
+            background-color: var(--success-bg) !important;
+            color: var(--success-color) !important;
+            font-weight: bold;
+            box-shadow: 0 0 0 2px var(--success-color);
+            cursor: default;
+        }
+
+        /* Zustand: Falsches Wort angeklickt */
+        .word.wrong {
+            background-color: var(--error-color) !important;
+            color: white !important;
+            animation: shake 0.3s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-4px); }
+            40%, 80% { transform: translateX(4px); }
+        }
+
+        /* Kontroll-Buttons */
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        #resetBtn {
+            background-color: #718096;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+            display: none;
+        }
+
+        #resetBtn:hover {
+            background-color: #4a5568;
+        }
+
+        .feedback {
+            text-align: center;
+            margin-top: 16px;
+            font-weight: bold;
+            min-height: 24px;
+            font-size: 1.1rem;
+        }
+        .feedback.success { color: var(--success-color); }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h2>Hotspot-Suche im Fließtext</h2>
+    
+    <div class="counter-container">
+        <div class="counter-badge" id="counter">Gefunden: 0 von 4</div>
+    </div>
+
+    <p class="instructions">
+        Lies den Text. <strong>Klicke auf alle Ausdrücke</strong>, die bedeuten, dass jemand selbst zu Besuch ist oder zu Besuch geht (<em>в гости</em> / <em>в гостях</em>).
+    </p>
+
+    <!-- Der präparierte Textblock -->
+    <div class="text-block" id="textBlock">
+        <span class="word">Привет!</span>
+        <span class="word">Вчера</span>
+        <span class="word">я</span>
+        <span class="word">ходила</span>
+        <!-- Richtige Phrase 1 -->
+        <span class="word target" data-target="1">в гости</span>
+        <span class="word">к</span>
+        <span class="word">моей</span>
+        <span class="word">подруге.</span>
+        <span class="word">Мы</span>
+        <span class="word">долго</span>
+        <span class="word">разговаривали.</span>
+        <span class="word">Когда</span>
+        <span class="word">я</span>
+        <span class="word">была</span>
+        <!-- Richtige Phrase 2 -->
+        <span class="word target" data-target="2">в гостях,</span>
+        <span class="word">её</span>
+        <span class="word">мама</span>
+        <span class="word">приготовила</span>
+        <span class="word">вкусный</span>
+        <span class="word">чай.</span>
+        <span class="word">Мой</span>
+        <span class="word">брат</span>
+        <span class="word">тоже</span>
+        <span class="word">любит</span>
+        <span class="word">ходить</span>
+        <!-- Richtige Phrase 3 -->
+        <span class="word target" data-target="3">в гости</span>
+        <span class="word">к</span>
+        <span class="word">друзьям.</span>
+        <span class="word">А</span>
+        <span class="word">вы</span>
+        <span class="word">сейчас</span>
+        <!-- Richtige Phrase 4 -->
+        <span class="word target" data-target="4">в гостях</span>
+        <span class="word">или</span>
+        <span class="word">дома?</span>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <div class="controls">
+        <button id="resetBtn">Neu starten</button>
+    </div>
+</div>
+
+<script>
+    const words = document.querySelectorAll('.word');
+    const counterBadge = document.getElementById('counter');
+    const feedback = document.getElementById('feedback');
+    const resetBtn = document.getElementById('resetBtn');
+
+    const totalTargets = document.querySelectorAll('.word.target').length;
+    let foundTargets = 0;
+
+    words.forEach(word => {
+        word.addEventListener('click', () => {
+            // Wenn das Wort bereits richtig gelöst wurde, tue nichts
+            if (word.classList.contains('correct')) return;
+
+            if (word.classList.contains('target')) {
+                // Richtiges Wort/Phrase getroffen
+                word.classList.add('correct');
+                foundTargets++;
+                updateCounter();
+
+                // Prüfen, ob alle Hotspots gefunden wurden
+                if (foundTargets === totalTargets) {
+                    feedback.textContent = "Hervorragend! Du hast alle gesuchten Phrasen im Text entdeckt! 🎯";
+                    feedback.className = "feedback success";
+                    resetBtn.style.display = 'block';
+                }
+            } else {
+                // Falsches Wort getroffen -> Direktes optisches Feedback
+                word.classList.add('wrong');
+                setTimeout(() => {
+                    word.classList.remove('wrong');
+                }, 300);
+            }
+        });
+    });
+
+    function updateCounter() {
+        counterBadge.textContent = `Gefunden: ${foundTargets} von ${totalTargets}`;
+    }
+
+    // --- NEUSTART ---
+    resetBtn.addEventListener('click', () => {
+        foundTargets = 0;
+        updateCounter();
+        feedback.textContent = "";
+        feedback.className = "feedback";
+        resetBtn.style.display = 'none';
+
+        words.forEach(word => {
+            word.classList.remove('correct', 'wrong');
+        });
+    });
+</script>
+
+</body>
+</html>
