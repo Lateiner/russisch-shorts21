@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch lernen: Live-Umfrage</title>
+    <style>
+        :root {
+            --primary-color: #2b6cb0;
+            --primary-hover: #1e4e8c;
+            --bg-color: #f7fafc;
+            --card-bg: #ffffff;
+            --text-color: #2d3748;
+            --border-color: #e2e8f0;
+            --option-1: #4299e1;
+            --option-2: #48bb78;
+            --option-3: #ed8936;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            padding: 28px;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 6px;
+            font-size: 1.6rem;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #4a5568;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .instructions {
+            font-size: 0.95rem;
+            color: #718096;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        /* Antwort-Kacheln */
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .option-card {
+            background: #fff;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px 20px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .option-card:hover {
+            border-color: var(--primary-color);
+            background-color: #f7fafc;
+            transform: translateY(-1px);
+        }
+
+        .translation {
+            font-size: 0.85rem;
+            color: #718096;
+            font-weight: normal;
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* Ergebnis-Diagramm (Ausgeblendet bis Klick) */
+        .results-container {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 12px;
+            margin-bottom: 24px;
+        }
+
+        .result-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .result-label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .bar-wrapper {
+            background: #edf2f7;
+            border-radius: 6px;
+            overflow: hidden;
+            width: 100%;
+            height: 28px;
+        }
+
+        .bar {
+            height: 100%;
+            width: 0%; /* Animiert per JS */
+            transition: width 1s cubic-bezier(0.1, 1, 0.1, 1);
+            display: flex;
+            align-items: center;
+            padding-left: 12px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* Farben der Balken */
+        .bar-1 { background-color: var(--option-1); }
+        .bar-2 { background-color: var(--option-2); }
+        .bar-3 { background-color: var(--option-3); }
+
+        /* Kontroll-Buttons */
+        .controls {
+            display: flex;
+            justify-content: center;
+        }
+
+        #resetBtn {
+            background-color: #718096;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+            display: none;
+        }
+
+        #resetBtn:hover {
+            background-color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h2>Interaktive Abschlussfrage</h2>
+    <div class="subtitle">Часто ли Вы ходите в гости?</div>
+    
+    <p class="instructions">
+        Beantworte die Frage ehrlich für dich selbst. Tippe auf eine Antwort, um das aktuelle Meinungsbild der Klasse zu sehen.
+    </p>
+
+    <!-- Umfrage-Auswahl -->
+    <div class="options-container" id="optionsContainer">
+        <div class="option-card" data-index="0">
+            <div>
+                <span>Да, очень часто</span>
+                <span class="translation">Ja, sehr oft.</span>
+            </div>
+            <span>➔</span>
+        </div>
+        <div class="option-card" data-index="1">
+            <div>
+                <span>Редко</span>
+                <span class="translation">Selten.</span>
+            </div>
+            <span>➔</span>
+        </div>
+        <div class="option-card" data-index="2">
+            <div>
+                <span>Никогда</span>
+                <span class="translation">Nie.</span>
+            </div>
+            <span>➔</span>
+        </div>
+    </div>
+
+    <!-- Live-Diagramm -->
+    <div class="results-container" id="resultsContainer">
+        <!-- Option 1 -->
+        <div class="result-row">
+            <div class="result-label">
+                <span>Да, очень часто</span>
+                <span id="percentLabel0">0%</span>
+            </div>
+            <div class="bar-wrapper">
+                <div class="bar bar-1" id="bar0"></div>
+            </div>
+        </div>
+        <!-- Option 2 -->
+        <div class="result-row">
+            <div class="result-label">
+                <span>Редко</span>
+                <span id="percentLabel1">0%</span>
+            </div>
+            <div class="bar-wrapper">
+                <div class="bar bar-2" id="bar1"></div>
+            </div>
+        </div>
+        <!-- Option 3 -->
+        <div class="result-row">
+            <div class="result-label">
+                <span>Никогда</span>
+                <span id="percentLabel2">0%</span>
+            </div>
+            <div class="bar-wrapper">
+                <div class="bar bar-3" id="bar2"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="resetBtn">Neu starten</button>
+    </div>
+</div>
+
+<script>
+    const optionsContainer = document.getElementById('optionsContainer');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const optionCards = document.querySelectorAll('.option-card');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // Basis-Stimmen der fiktiven Klasse vordefinieren
+    let votes = [14, 19, 3]; 
+
+    optionCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const index = parseInt(card.getAttribute('data-index'));
+            
+            // Die Stimme des aktuellen Schülers hinzufügen
+            votes[index]++;
+
+            // Gesamtsumme berechnen
+            const totalVotes = votes.reduce((a, b) => a + b, 0);
+
+            // Wechsel von Auswahl zu Diagramm-Ansicht
+            optionsContainer.style.display = 'none';
+            resultsContainer.style.display = 'flex';
+            resetBtn.style.display = 'block';
+
+            // Diagrammbalken berechnen und rendern
+            votes.forEach((voteCount, i) => {
+                const percentage = Math.round((voteCount / totalVotes) * 100);
+                const bar = document.getElementById(`bar${i}`);
+                const label = document.getElementById(`percentLabel${i}`);
+
+                // Wert setzen und CSS-Transition triggern
+                bar.style.width = `${percentage}%`;
+                bar.textContent = percentage > 8 ? `${voteCount} V.` : ''; // Stimmenanzahl im Balken, falls Platz vorhanden
+                label.textContent = `${percentage}% (${voteCount} Stimmen)`;
+            });
+        });
+    });
+
+    // --- NEUSTART ---
+    resetBtn.addEventListener('click', () => {
+        // Eigene Stimme für die Simulation wieder abziehen, um Verfälschungen bei Demo-Zwecken zu minimieren
+        // (Für eine echte Session bleibt der Zustand lokal auf diesem Gerät zurückgesetzt)
+        optionsContainer.style.display = 'flex';
+        resultsContainer.style.display = 'none';
+        resetBtn.style.display = 'none';
+
+        // Balken zurücksetzen
+        for(let i=0; i<3; i++) {
+            document.getElementById(`bar${i}`).style.width = '0%';
+        }
+    });
+</script>
+
+</body>
+</html>
