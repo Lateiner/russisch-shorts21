@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch lernen: Lückentext</title>
+    <style>
+        :root {
+            --primary-color: #2b6cb0;
+            --primary-hover: #1e4e8c;
+            --bg-color: #f7fafc;
+            --card-bg: #ffffff;
+            --text-color: #2d3748;
+            --border-color: #cbd5e0;
+            --success-color: #48bb78;
+            --success-bg: #f0fff4;
+            --error-color: #f56565;
+            --error-bg: #fff5f5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 650px;
+            width: 100%;
+            padding: 24px;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-size: 1.5rem;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .instructions {
+            font-size: 0.95rem;
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 28px;
+            line-height: 1.4;
+        }
+
+        /* Textbereich-Styling */
+        .text-passage {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 1.25rem;
+            color: #1a202c;
+            margin-bottom: 24px;
+        }
+
+        .sentence {
+            margin-bottom: 16px;
+        }
+        .sentence:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Dropdown-Menüs im Text */
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-color: #fff;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            padding: 4px 28px 4px 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin: 0 4px;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%232b6cb0' d='M0 0l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
+        }
+
+        /* Status-Klassen für die Auswertung */
+        select.correct {
+            border-color: var(--success-color);
+            background-color: var(--success-bg);
+            color: var(--success-color);
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='10' viewBox='0 0 12 10'><path fill='%2348bb78' d='M4 10L0 6l1.4-1.4L4 7.2l6.6-6.6L12 2z'/></svg>");
+            background-position: right 10px center;
+            pointer-events: none;
+        }
+
+        select.incorrect {
+            border-color: var(--error-color);
+            background-color: var(--error-bg);
+            color: var(--error-color);
+        }
+
+        /* Kontroll-Buttons */
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        button {
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        #checkBtn {
+            background-color: var(--primary-color);
+        }
+
+        #checkBtn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        #resetBtn {
+            background-color: #718096;
+            display: none;
+        }
+
+        #resetBtn:hover {
+            background-color: #4a5568;
+        }
+
+        /* Feedback-Meldung */
+        .feedback {
+            text-align: center;
+            margin-top: 16px;
+            font-weight: bold;
+            min-height: 24px;
+        }
+        .feedback.success { color: var(--success-color); }
+        .feedback.error { color: var(--error-color); }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h2>Lückentext: Wähle die richtige Wendung</h2>
+    <p class="instructions">
+        Lies die Sätze aufmerksam durch und wähle für jede Lücke den grammatikalisch passenden Ausdruck aus.
+    </p>
+
+    <div class="text-passage">
+        <div class="sentence">
+            1. Вчера я ходила 
+            <select class="gap" data-answer="в гости">
+                <option value="" disabled selected>?</option>
+                <option value="в гости">в гости</option>
+                <option value="в гостях">в гостях</option>
+            </select> 
+            к моей подруге.
+        </div>
+        
+        <div class="sentence">
+            2. Я была 
+            <select class="gap" data-answer="в гостях">
+                <option value="" disabled selected>?</option>
+                <option value="в гости">в гости</option>
+                <option value="в гостях">в гостях</option>
+            </select> 
+            у моей подруги.
+        </div>
+
+        <div class="sentence">
+            3. Часто ли Вы ходите 
+            <select class="gap" data-answer="в гости">
+                <option value="" disabled selected>?</option>
+                <option value="в гости">в гости</option>
+                <option value="в гостях">в гостях</option>
+            </select> 
+            ?
+        </div>
+
+        <div class="sentence">
+            4. В русском языке есть интересная фраза: быть 
+            <select class="gap" data-answer="в гостях">
+                <option value="" disabled selected>?</option>
+                <option value="в гости">в гости</option>
+                <option value="в гостях">в гостях</option>
+            </select> 
+            .
+        </div>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <div class="controls">
+        <button id="checkBtn">Überprüfen</button>
+        <button id="resetBtn">Neu starten</button>
+    </div>
+</div>
+
+<script>
+    const gaps = document.querySelectorAll('.gap');
+    const checkBtn = document.getElementById('checkBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const feedback = document.getElementById('feedback');
+
+    gaps.forEach(gap => {
+        gap.addEventListener('change', () => {
+            gap.classList.remove('incorrect');
+            feedback.textContent = "";
+            feedback.className = "feedback";
+        });
+    });
+
+    // --- AUSWERTUNG ---
+    checkBtn.addEventListener('click', () => {
+        let allCorrect = true;
+        let anyEmpty = false;
+
+        gaps.forEach(gap => {
+            const selectedValue = gap.value;
+            const correctAnswer = gap.getAttribute('data-answer');
+
+            if (!selectedValue) {
+                anyEmpty = true;
+                gap.classList.add('incorrect');
+            } else if (selectedValue === correctAnswer) {
+                gap.classList.remove('incorrect');
+                gap.classList.add('correct');
+            } else {
+                gap.classList.add('incorrect');
+                allCorrect = false;
+            }
+        });
+
+        if (anyEmpty) {
+            feedback.textContent = "Bitte fülle alle Lücken aus!";
+            feedback.className = "feedback error";
+        } else if (allCorrect) {
+            feedback.textContent = "Klasse! Du hast alle Lücken richtig ausgefüllt! 🎉";
+            feedback.className = "feedback success";
+            checkBtn.style.display = 'none';
+            resetBtn.style.display = 'block';
+        } else {
+            feedback.textContent = "Da stimmt noch etwas nicht. Überprüfe die rot markierten Lücken!";
+            feedback.className = "feedback error";
+        }
+    });
+
+    // --- NEUSTART ---
+    resetBtn.addEventListener('click', () => {
+        gaps.forEach(gap => {
+            gap.value = "";
+            gap.classList.remove('correct', 'incorrect');
+            gap.style.pointerEvents = 'auto';
+        });
+
+        feedback.textContent = "";
+        feedback.className = "feedback";
+        checkBtn.style.display = 'block';
+        resetBtn.style.display = 'none';
+    });
+</script>
+
+</body>
+</html>
